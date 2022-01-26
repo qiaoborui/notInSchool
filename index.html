@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html>
+ <head> 
+  <link rel="shortcut icon" href="./assets/avatar.jpg" /> 
+  <link href="https://cdn.bootcdn.net/ajax/libs/muse-ui/3.0.2/muse-ui.min.css" rel="stylesheet"> 
+  <link type="text/css" rel="stylesheet" href="https://at.alicdn.com/t/font_1755564_z4mhxbw13mq.css" /> 
+  <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" /> 
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+  <meta name="apple-mobile-web-app-title" content="我不在校园" /> 
+  <meta name="apple-mobile-web-app-capable" content="yes" /> 
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" /> 
+  <link rel="apple-touch-icon" href="./assets/avatar.jpg" /> 
+  <style>
+
+.button-wrapper {
+  text-align: center;
+}
+
+.button-wrapper .mu-button {
+  margin: 20px;
+  vertical-align: center;
+}
+
+.button-wrapper a.mu-button {
+  text-decoration: none;
+}
+
+
+.center-text {
+    text-align: center;
+}
+
+        #app,
+        header,
+        footer {
+            box-sizing: border-box;
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .item {
+        font-weight: 300;
+        font-style: normal;
+        line-height: 1.8rem;
+        width:250px;
+        margin-left: 20px;
+        background: #fff;
+        padding: 2px 6px 2px 6px;
+        border-radius: 5px;
+        box-shadow: 0 1px 6px rgba(32, 33, 36, 0.28);
+        margin-top: 10px;
+        border-top: 3px solid;
+        text-align: justify;
+        }
+
+        aside {
+        font-weight: 300;
+        font-style: normal;
+        line-height: 1.8rem;
+        }
+
+        h1 {
+            font-weight:900
+        }
+
+        body,
+        button {
+        font-family: 'Noto Serif SC', serif;
+        }
+
+        .load-btn {
+        border: 2px solid #666;
+        width: 130px;
+        outline: none;
+        font-size: 20px;
+        border-radius: 100px;
+        margin: 30px auto;
+        color: #666;
+        line-height: 30px;
+        float: left;
+        background: #fff;
+        }
+        .load-btn:hover:active {
+        background: #666;
+        color: #fff;
+        }
+        .load-btn-right {
+        border: 2px solid #666;
+        width: 130px;
+        outline: none;
+        font-size: 20px;
+        border-radius: 100px;
+        margin: 30px auto;
+        color: #666;
+        line-height: 30px;
+        float: right;
+        background: #fff;
+        }
+        .load-btn-right:hover:active {
+        background: #666;
+        color: #fff;
+    }
+
+
+    </style>
+ </head>  
+ <body> 
+  <header id="header"> 
+   <h1>我不在校园</h1> 
+  </header> 
+  <main id="app"> 
+   <aside> 
+    <p id="describe"> 用于我在校园定时签到，随信控学院打卡要求而变化，目前只开启中午的健康打卡。用法点击下方按钮 </p> 
+    <mu-flex align-items="end" justify-content="between" style="margin: 10px;"> 
+        <mu-button  fab color="info" @click="$alert('1.输入手机号密码等相关数据，除bark外其余必填！！\
+        2.需要填经纬度时点击定位即可\
+        3.填完所有信息点击提交即可。\
+        4.bark填写规则为https://api.dat.app/****,*号为你的key,填写时将整个链接填入', '新用户用法', {okLabel: '知道了'})"  class="button-wrapper">
+         新用户
+        </mu-button> 
+        <mu-button  color="info" fab @click="$alert('1.输入姓名点击提交，等待片刻获取成功\n\
+        2.更改需要更改的信息（如需更改经纬度可点击定位按钮）\n\
+        3.填完所以信息后，点击更新，等待片刻即可', '老用户用法', {okLabel: '知道了'})"  class="button-wrapper">
+         老用户
+        </mu-button>
+        <mu-button @click="setPosition" fab="true" medium="" color="primary" class="button-wrapper">
+          定位
+         </mu-button>
+    </mu-flex>
+   </aside> 
+   <table> 
+    <tbody>
+     <tr v-for="item in datas"> 
+      <td align="justify" v-text="item.name"></td> 
+      <td><input v-model="item.value" :placeholder="item.tip" class="item" required="" /></td> 
+     </tr> 
+    </tbody>
+   </table> 
+   <mu-flex align-items="end" justify-content="between" style="margin: 30px;"> 
+    <mu-button v-loading="isubmit" :disabled="isClick" round="" color="success" @click="valid" data-mu-loading-size="24" class="button-wrapper">
+     提交
+    </mu-button> 
+    <mu-button v-loading="isupdates"  :disabled="isClick" round="" color="primary" @click="update" data-mu-loading-size="24" class="button-wrapper">
+     更新
+    </mu-button> 
+   </mu-flex> 
+   <br /> 
+   <br /> 
+  </main> 
+  <footer> 
+   <p class="center-text">Copyright &copy; 2022 Strawberry, All Rights Reserved</p> 
+  </footer>  
+  <script src="https://cdn.bootcdn.net/ajax/libs/vue/2.6.9/vue.min.js"></script>
+  <script src="https://code.bdstatic.com/npm/leancloud-storage@4.12.0/dist/av-min.js"></script> 
+  <link rel="stylesheet" href="./css/muse-ui-message.all.css"/>
+  <script src="https://cdn.bootcdn.net/ajax/libs/muse-ui/3.0.2/muse-ui.min.js"></script> 
+  <link href="https://cdn.bootcdn.net/ajax/libs/material-design-icons/3.0.2/iconfont/material-icons.css" rel="stylesheet"> 
+  <script src="./js/muse-ui-toast.js"></script> 
+  <link rel="stylesheet" href="./css/muse-ui-loading.all.css" /> 
+  <script src="./js/muse-ui-loading.js"></script> 
+  
+  <script src="./js/muse-ui-message.js"></script>
+  <script>
+      MuseUIToast.config({
+  position: 'bottom',               // 弹出的位置
+  time: 2000,                       // 显示的时长
+  closeIcon: 'close',               // 关闭的图标
+  close: true,                      // 是否显示关闭按钮
+  successIcon: 'check_circle',      // 成功信息图标
+  infoIcon: 'info',                 // 信息信息图标
+  warningIcon: 'priority_high',     // 提醒信息图标
+  errorIcon: 'warning'              // 错误信息图标
+})
+        var {User,Query}=AV;
+        AV.init({
+            appId:"r5eeSMNIH8qkV1Q7qj1t9rPl-MdYXbMMI",
+            appKey:"tKYUNg0VwmBI1916JV6sQyGr"
+        })
+        var query = new AV.Query('InSchool');
+        var app = new Vue({
+            el:'#app',
+            data:{
+                isupdates:false,
+                isubmit:false,
+                isClick:false,
+                datas:{
+                name:{
+                    name:"姓名：",
+                    value:""
+                },
+                phone:{
+                    name:"手机号：",
+                    value:""
+                },
+                passwd:{
+                    name:"密码：",
+                    value:""
+                },
+                log:{
+                    name:"经度：",
+                    value:"",
+                    tip:"精度到小数点后六位"
+                },
+                lat:{
+                    name:"纬度：",
+                    value:"",
+                    tip:"精度到小数点后六位"
+                },
+                bark:{
+                    name:"bark：",
+                    value:"",
+                    tip:"可选"
+                },
+                status:{
+                    name:"启用：",
+                    value:"",
+                    tip:"1为启用/0为禁用"
+                }},
+                id:''
+            },
+            methods:{
+                valid:async function(event){
+                    this.isubmit=true
+                    this.isClick=true
+                    if(this.datas.name.value==""){
+                        this.isubmit=false
+                        this.isClick=false
+                        this.$toast.error('至少填写姓名')
+                        return
+                    }
+                    result = await find(this.datas)
+                    console.log(result)
+                    if (result!=false){
+                        this.$toast.success("获取用户成功")
+                    this.id = result.id
+                    result = result.attributes
+                    this.datas.phone.value=result.username
+                    this.datas.passwd.value = result.passwd
+                    this.datas.bark.value=result.bark
+                    this.datas.lat.value=result.lat
+                    this.datas.log.value=result.log
+                    this.datas.name.value = result['Zh_name']
+                    this.datas.status.value = result.status 
+                    this.isClick=false
+                    this.isubmit = false
+                    return
+                    }
+                    else{
+                        var pre = this.datas
+                        if(!pre.status.value||!pre.passwd.value||!pre.name.value||!pre.log.value||!pre.lat.value){
+                            this.$toast.error('除bark外均为必填项')
+                            this.isubmit=false
+                            this.isClick=false
+                            return
+                        }
+                        const InSchool = AV.Object.extend('InSchool');
+                        peo = new InSchool();
+                        peo.set("username",pre.phone.value)
+                        peo.set("passwd",pre.passwd.value)
+                        peo.set("Zh_name",pre.name.value)
+                        peo.set("bark",pre.bark.value)
+                        peo.set("log",Number(pre.log.value))
+                        peo.set("lat",Number(pre.lat.value))
+                        peo.set("status",Number(pre.status.value))
+                        peo.save().then((peo)=>{this.$toast.success("提交成功")},(error)=>{this.$toast.error("提交失败，请重试")})
+                    }
+                    this.isubmit = false
+                    this.isClick=false
+                    return
+                },
+                update:async function(event){
+                    this.isupdates=true
+                    this.isClick=true
+                    console.log(this.isupdates)
+                    var pre = this.datas
+                    if(!pre.status.value||!pre.passwd.value||!pre.name.value||!pre.log.value||!pre.lat.value){
+                        this.$toast.error('除bark外均为必填项')
+                        this.isupdates=false
+                        this.isClick=false
+                        return
+                    }
+                    const peos = AV.Object.createWithoutData('InSchool', this.id);
+                    peos.set("username",pre.phone.value)
+                    peos.set("passwd",pre.passwd.value)
+                    peos.set("Zh_name",pre.name.value)
+                    peos.set("bark",pre.bark.value)
+                    peos.set("log",Number(pre.log.value))
+                    peos.set("lat",Number(pre.lat.value))
+                    peos.set("status",Number(pre.status.value))
+                    console.log(peos)
+                    console.log(this.id)
+                    peos.save().then((peo)=>{this.$toast.success("更新成功");this.isupdates=false;this.isClick=false},(error)=>{this.$toast.error("更新失败，请重试");console.log(error);this.isClick=false;this.isupdates=false})
+                },
+                setPosition:function(event){
+                    setPos()
+                }
+            
+            }
+        })
+        function setPos(){
+        getPosition().then(result => {
+        // 返回结果示例：
+        // {latitude: 30.318030999999998, longitude: 120.05561639999999}
+        // 一般小数点后只取六位，所以用以下代码搞定
+        let queryData = {
+          longtitude: String(result.longitude).match(/\d+\.\d{0,6}/)[0],
+          latitude: String(result.latitude).match(/\d+\.\d{0,6}/)[0],
+          channelType: '00'
+        }
+        console.log(queryData)
+        app.datas.lat.value = queryData.latitude
+        app.datas.log.value = queryData.longtitude    
+        // 以下放置获取坐标后你要执行的代码:
+        // ...
+      }).catch(err => {
+        console.log(err)
+      })}
+        async function find(datas){
+            result =await query.equalTo("Zh_name",datas.name.value).find().then(each=>{
+                if(each.length==0){
+                    console.log('None')
+                    return false
+                }
+                else{
+                    console.log("full")
+                    return each[0]
+                }
+            })
+            return result
+        }
+    function getPosition () {
+        return new Promise((resolve, reject) => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(function (position) {
+        let latitude = position.coords.latitude
+        let longitude = position.coords.longitude
+        let data = {
+          latitude: latitude,
+          longitude: longitude
+        }
+        resolve(data)
+      }, function () {
+        reject(arguments)
+      })
+    } else {
+      reject('你的浏览器不支持当前地理位置信息获取')
+    }
+  })
+}
+    </script> 
+ </body>
+</html>
