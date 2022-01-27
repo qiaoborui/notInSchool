@@ -1,16 +1,18 @@
 import json
 import datetime
 import time
+import os
 import pytz
 import random
 import hashlib
 import requests
 def getAddress(lat,lng):
   session = requests.session()
-  location = session.get(f'https://apis.map.qq.com/ws/coord/v1/translate?locations={lat},{lng}&type=1&key=E6ABZ-UJOWW-Y3PRW-OYZFV-HFCOS-EOBPU').json()
+  AK=os.getenv("BD_AK")
+  location = session.get(f'https://apis.map.qq.com/ws/coord/v1/translate?locations={lat},{lng}&type=1&key={AK}').json()
   lat=location['locations'][0]['lat']
   lng=location['locations'][0]['lng']
-  result = session.get(f'https://apis.map.qq.com/ws/geocoder/v1/?location={lat},{lng}&poi_options=policy=4&key=E6ABZ-UJOWW-Y3PRW-OYZFV-HFCOS-EOBPU').json()
+  result = session.get(f'https://apis.map.qq.com/ws/geocoder/v1/?location={lat},{lng}&poi_options=policy=4&key={AK}').json()
   results = result['result']['address_component']
   try:
     results['township'] = result['result']['address_reference']['town']['title']
@@ -29,8 +31,8 @@ def isEnabled(dict):
 def getData(sheet):
   timestamp = str(round(time.time() * 1000))
   r = requests.get(f'https://r5eeSMNI.api.lncldglobal.com/1.1/classes/{sheet}',headers={
-  'X-LC-Id':"r5eeSMNIH8qkV1Q7qj1t9rPl-MdYXbMMI",
-  'X-LC-Sign':md5( timestamp + "tKYUNg0VwmBI1916JV6sQyGr")+","+timestamp},timeout=None).json()
+  'X-LC-Id':os.getenv("appid"),
+  'X-LC-Sign':md5( timestamp + os.getenv("appkey"))+","+timestamp},timeout=None).json()
   data_stream = r['results']
   data_stream = list(filter(isEnabled, data_stream))
   return data_stream
