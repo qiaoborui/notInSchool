@@ -3,7 +3,6 @@ import datetime
 import time
 import os
 import pytz
-import random
 import hashlib
 import requests
 def getAddress(lat,lng):
