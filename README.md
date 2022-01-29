@@ -2,7 +2,7 @@
 
 ## 项目简介
 - 基于python3和leancloud实现了我在校园自动打卡、晚签、晨检及用户数据存储功能
-- 基于Vue实现了网页在线创建新用户，已经已有信息的更新。
+- 基于Vue实现了网页在线创建新用户，以及已有信息的更新。
 [我不在校园](https://qiaoborui.github.io/notInSchool)
 
 ## 功能介绍
