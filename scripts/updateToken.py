@@ -47,7 +47,7 @@ class WozaixiaoyuanPuncher:
             print(res)
             print(username)
             print("登录失败，请检查账号信息")
-            self.sendNotify("❌ 打卡失败，登录错误，请检查账号信息","⏱️ 我在校园")
+            self.sendNotify("❌ 登录失败，请检查账号信息","⏱️ 我在校园")
             return False
     def setJwsession(self, jwsession):
         # 如果找不到cache,新建cache储存目录与文件
