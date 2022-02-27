@@ -1,0 +1,27 @@
+{
+  "name": "我在校园",
+  "desc": "我在校园相关脚本",
+  "date": "2022-02-27 20:32:08",
+  "type": "none",
+  "list": [
+    {
+      "name": "健康打卡",
+      "type": "cron",
+      "time": "5 12 * * *",
+      "running": false,
+      "job": {
+        "type": "exec",
+        "target": "python3 https://raw.githubusercontent.com/qiaoborui/notInSchool/main/scripts/healthcheck.py"
+      }
+    },{
+      "name": "晨检",
+      "type": "cron",
+      "time": "02 7 * * *",
+      "running": false,
+      "job": {
+        "type": "exec",
+        "target": "python3 https://raw.githubusercontent.com/qiaoborui/notInSchool/main/scripts/dailyCheck.py"
+      }
+    }
+  ]
+}
