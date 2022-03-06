@@ -15,29 +15,22 @@ print = functools.partial(print, flush=True)
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 class WozaixiaoyuanPuncher:
-    def __init__(self,username,password,bark=None):
-        self.username = username
-        self.password = password
-        self.bark = bark
-        self.healthurl = "https://student.wozaixiaoyuan.com/health/save.json"
+    def __init__(self,dict):
+        self.username = dict['username']
+        self.password = dict['passwd']
+        self.lc=utils.leancloud.Query('InSchool').equal_to("username",self.username).first()
+        try:
+            self.bark = dict['bark']
+        except:
+            self.bark = None
         self.sign_url="https://student.wozaixiaoyuan.com/sign/getSignMessage.json"
-        self.heat_list_url = "https://student.wozaixiaoyuan.com/heat/getTodayHeatList.json"
         self.nightsignList = "https://student.wozaixiaoyuan.com/getMessage.json"
         self.nightsignurl = "https://student.wozaixiaoyuan.com/sign/doSign.json"
         self.loginurl = "https://gw.wozaixiaoyuan.com/basicinfo/mobile/login/username"
-        self.heat_url = "https://student.wozaixiaoyuan.com/heat/save.json"
         self.jwsession = None
-        self.sign_data = {
-            "answers": '["0","0","1"]',
-            "latitude": str(random.uniform(34.01085662841797,34.01085662841900)),
-            "longitude": str(random.uniform(108.75390625,108.75390725)),
-            "country": "中国",
-            "city": "西安市",
-            "district": "鄠邑区",
-            "province": "陕西省",
-            "township": "草堂街道",
-            "street": "中心街",
-        }
+        self.log=float(dict['log'])
+        self.lat=float(dict['lat'])
+        add = utils.getAddress(self.lat,self.log)
         self.headers = {
             "Accept-Encoding": "gzip, deflate, br",
             "Connection": "keep-alive",
@@ -47,28 +40,16 @@ class WozaixiaoyuanPuncher:
             "Accept-Language": "en-us,en",
             "Accept": "application/json, text/plain, */*"
         }
-        self.heat_data = {
-            "answers": '["0"]',
-            "seq": "1",
-            "temperature": str(round(random.uniform(36.0,36.7),1)),
-            "latitude": str(random.uniform(34.01085662841797,34.01085662841900)),
-            "longitude": str(random.uniform(108.75390625,108.75390725)),
-            "country": "中国",
-            "city": "西安市",
-            "district": "鄠邑区",
-            "province": "陕西省",
-            "township": "草堂街道",
-            "street": "中心街",
-        }
         self.nightData ={#id,signid
             "latitude": str(random.uniform(34.01085662841797,34.01085662841900)),
             "longitude":str(random.uniform(108.75390625,108.75390725)) ,
             "country": "中国",
-            "city": "西安市",
-            "district": "鄠邑区",
-            "province": "陕西省",
-            "township": "草堂街道",
-            "street": "中心街"}
+            "city": add['city'],
+            "district":add['district'],
+            "province": add['province'],
+            "township": add['township'],
+            "street":add['street']
+            }
         self.body="{}"
     def login(self):
         username, password = str(self.username), str(self.password)
@@ -89,8 +70,9 @@ class WozaixiaoyuanPuncher:
             print("登录失败，请检查账号信息")
             self.sendNotify("❌ 打卡失败，登录错误，请检查账号信息","⏱️ 我在校园")
             return False
+    
     def setJwsession(self, jwsession):
-        # 如果找不到cache,新建cache储存目录与文件
+        """# 如果找不到cache,新建cache储存目录与文件
         if not os.path.exists('.cache'):
             print("正在创建cache储存目录与文件...")
             os.mkdir('.cache')
@@ -104,12 +86,15 @@ class WozaixiaoyuanPuncher:
             data = utils.processJson(f'.cache/{self.username}_cache.json').read()
             data['jwsession'] = jwsession
         utils.processJson(f'.cache/{self.username}_cache.json').write(data)
-        self.jwsession = data['jwsession']
+        self.jwsession = data['jwsession']"""
+        self.lc.set("cache",jwsession)
+        self.lc.save()
+        self.jwsession = jwsession
 
     def getJwsession(self):
         if not self.jwsession:  # 读取cache中的配置文件
-            data = utils.processJson(f'.cache/{self.username}_cache.json').read()
-            self.jwsession = data['jwsession']
+            data = self.lc.get("cache")
+            self.jwsession = data
         return self.jwsession
 
     def sendNotify(self,result,title):
@@ -200,144 +185,25 @@ class WozaixiaoyuanPuncher:
         print("所有签到处理完毕")
         #self.sendNotify("所有签到处理完毕","⏰ 我在校园晚签结果通知")
         return
-    def doPunchIn(self):
-        url = self.healthurl
-        del self.headers['Host']
-        self.headers['Content-Type'] = "application/x-www-form-urlencoded"
-        self.headers['JWSESSION'] = self.getJwsession()
-        sign_data=self.sign_data
-        data = urlencode(sign_data)
-        self.session = requests.session()
-        response = self.session.post(url=url, data=data, headers=self.headers)
-        response = json.loads(response.text)
-        # 打卡情况        
-        # 如果 jwsession 无效，则重新 登录 + 打卡
-        if response['code'] == -10:
-            print(response)
-            print('jwsession 无效，将尝试使用账号信息重新登录')
-            loginStatus = self.login()
-            if loginStatus:
-                self.doPunchIn()
-            else:
-                print(response)
-                print("重新登录失败，请检查账号信息")
-                self.sendNotify("❌ 打卡失败，登录错误，请检查账号信息","⏰ 我在校园健康打卡结果通知")
-
-        elif response["code"] == 0:
-            self.sendNotify("✅ 打卡成功","⏰ 我在校园打卡（健康打卡）结果通知")
-            print("打卡成功")
-        elif response['code'] == 1:
-            self.sendNotify("❌ 打卡失败，当前不在打卡时间段内","⏰ 我在校园打卡（健康打卡）结果通知")
-            print("打卡失败：今日健康打卡已结束")
-            self.status_code = 3
-        else:
-            self.sendNotify("❌ 打卡失败，未知原因","⏰ 我在校园打卡（健康打卡）结果通知")
-            print("打卡失败")
     
-    def dailyCheck(self):
-        print("获取打卡列表中...")
-        url = self.heat_list_url
-        self.headers['Host'] = "student.wozaixiaoyuan.com"
-        self.headers['JWSESSION'] = self.getJwsession()
-        self.session = requests.session()
-        response = self.session.post(url=url, data=self.body, headers=self.headers)
-        res = json.loads(response.text)
-        # 如果 jwsession 无效，则重新 登录 + 打卡
-        if res['code'] == -10:
-            print(res)
-            print('jwsession 无效，将尝试使用账号信息重新登录')
-            loginStatus = self.login()
-            if loginStatus:
-                self.PunchIn()
-            else:
-                print(res)
-                print("重新登录失败，请检查账号信息") 
-                self.sendNotify("❌ 打卡失败，登录错误，请检查账号信息","⏰ 我在校园（日检日报）结果通知")    
-        elif res['code'] == 0:                    
-            # 标志时段是否有效
-            inSeq = False
-            # 遍历每个打卡时段（不同学校的打卡时段数量可能不一样）
-            for i in res['data']:
-                # 判断时段是否有效
-                if int(i['state']) == 1:
-                    inSeq = True
-                    # 保存当前学校的打卡时段
-                    self.seq = int(i['seq'])
-                    # 判断是否已经打卡
-                    if int(i['type']) == 0:
-                        self.execdoPunchIn()
-                    elif int(i['type']) == 1:
-                        print("已经打过卡了")
-            # 如果当前时间不在任何一个打卡时段内
-            if inSeq == False:            
-                print("打卡失败：不在打卡时间段内")
-            self.sendNotify("❌ 不在任意打卡时间段","⏰ 我在校园（日检日报）结果通知") 
-    def execdoPunchIn(self):
-        url = self.heat_url
-        self.headers['Host'] = "student.wozaixiaoyuan.com"
-        self.headers['Content-Type'] = "application/x-www-form-urlencoded"
-        self.headers['JWSESSION'] = self.getJwsession()
-        sign_data = self.heat_data
-        data = urlencode(sign_data)
-        self.session = requests.session()    
-        response = self.session.post(url=url, data=data, headers=self.headers)
-        response = json.loads(response.text)
-        # 打卡情况
-        if response["code"] == 0:
-            self.status_code = 1
-            print("打卡成功")
-            self.sendNotify("✅ 打卡成功","⏰ 我在校园打卡（日检日报）结果通知")
-        else:
-            print(response)
-            print("打卡失败")
-            self.sendNotify("❌ 打卡失败","⏰ 我在校园(日检日报)结果通知") 
 
-def md5(str):
-    m = hashlib.md5()
-    m.update(str.encode("utf8"))
-    #print(m.hexdigest())
-    return m.hexdigest()
-
-def main():
-    timestamp = str(round(time.time() * 1000))
-    r = requests.get("https://r5eeSMNI.api.lncldglobal.com/1.1/classes/InSchool",headers={
-    'X-LC-Id':os.getenv('appid'),
-    'X-LC-Sign':md5( timestamp + os.getenv('appkey') )+","+timestamp},timeout=None).json()
-    userList = r['results']
+if __name__=='__main__':
+    userList = utils.getData("InSchool")
     random.shuffle(userList)
     for dict in userList:
-        try:
-            status = dict['status']
-        except:
-            status = 1
-        if status==0:
-            continue
         name = dict['Zh_name']
         print('用户“{}”开始--------------------{}'.format(name,time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time.time()))))
+        locals()[name] = WozaixiaoyuanPuncher(dict)
         try:
-            start = dict['start']
-            end = dict['end']
+            dict['cache']
+            print("找到cache文件，尝试使用jwsession打卡...")
+            locals()[name].AutoSign()
         except:
-            start=0
-            end=59
-        minute = utils.getCurrentMinute()
-        try:
-            dict['bark']
-        except:
-            locals()[name] = WozaixiaoyuanPuncher(dict['username'],dict['passwd'])
-        else:
-            locals()[name] = WozaixiaoyuanPuncher(dict['username'],dict['passwd'],dict['bark'])
-        username = dict['username']
-        if not os.path.exists(f'.cache/{username}_cache.json'):
             print ("找不到cache文件，正在使用账号信息登录...")
             loginStatus = locals()[name].login()
             if loginStatus:
                 locals()[name].AutoSign()
             else:
                 print("登陆失败，请检查账号信息")
-        else:
-            print("找到cache文件，尝试使用jwsession打卡...")
-            locals()[name].AutoSign()
         print(f'用户{name}结束-----------------------\n')
         time.sleep(round(random.uniform(1.0,6.0),1))
-main()

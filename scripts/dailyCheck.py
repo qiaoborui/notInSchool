@@ -15,6 +15,7 @@ class WozaixiaoyuanPuncher:
     def __init__(self,dict):
         self.username = dict['username']
         self.password = dict['passwd']
+        self.lc=utils.leancloud.Query('InSchool').equal_to("username",self.username).first()
         try:
             self.bark = dict['bark']
         except:
@@ -70,7 +71,7 @@ class WozaixiaoyuanPuncher:
             self.sendNotify("❌ 打卡失败，登录错误，请检查账号信息","⏱️ 我在校园")
             return False
     def setJwsession(self, jwsession):
-        # 如果找不到cache,新建cache储存目录与文件
+        """# 如果找不到cache,新建cache储存目录与文件
         if not os.path.exists('.cache'):
             print("正在创建cache储存目录与文件...")
             os.mkdir('.cache')
@@ -84,12 +85,15 @@ class WozaixiaoyuanPuncher:
             data = utils.processJson(f'.cache/{self.username}_cache.json').read()
             data['jwsession'] = jwsession
         utils.processJson(f'.cache/{self.username}_cache.json').write(data)
-        self.jwsession = data['jwsession']
+        self.jwsession = data['jwsession']"""
+        self.lc.set("cache",jwsession)
+        self.lc.save()
+        self.jwsession = jwsession
 
     def getJwsession(self):
         if not self.jwsession:  # 读取cache中的配置文件
-            data = utils.processJson(f'.cache/{self.username}_cache.json').read()
-            self.jwsession = data['jwsession']
+            data = self.lc.get("cache")
+            self.jwsession = data
         return self.jwsession
 
     def sendNotify(self,result,title):
@@ -175,6 +179,7 @@ if __name__=='__main__':
         print('用户“{}”开始--------------------{}'.format(name,time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time.time()))))
         locals()[name] = WozaixiaoyuanPuncher(dict)
         username = dict['username']
+        '''
         if not os.path.exists(f'.cache/{username}_cache.json'):
             print ("找不到cache文件，正在使用账号信息登录...")
             loginStatus = locals()[name].login()
@@ -185,5 +190,17 @@ if __name__=='__main__':
         else:
             print("找到cache文件，尝试使用jwsession打卡...")
             locals()[name].dailyCheck()
+        '''
+        try:
+            dict['cache']
+            print("找到cache文件，尝试使用jwsession打卡...")
+            locals()[name].dailyCheck()
+        except:
+            print ("找不到cache文件，正在使用账号信息登录...")
+            loginStatus = locals()[name].login()
+            if loginStatus:
+                locals()[name].dailyCheck()
+            else:
+                print("登陆失败，请检查账号信息")
         print(f'用户{name}结束-----------------------\n')
         time.sleep(round(random.uniform(1.0,6.0),1))

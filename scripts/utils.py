@@ -5,6 +5,8 @@ import os
 import pytz
 import hashlib
 import requests
+import leancloud
+leancloud.init(os.getenv('appid'),os.getenv('appkey'))
 def getAddress(lat,lng):
   session = requests.session()
   AK=os.getenv("BD_AK")
