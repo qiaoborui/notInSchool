@@ -22,7 +22,10 @@ class WozaixiaoyuanPuncher:
         self.password = dict['passwd']
         self.lc=utils.leancloud.Query('InSchool').equal_to("username",self.username).first()
         try:
-            self.bark = dict['bark']
+            if len(dict['bark'])<=10:
+                self.bark = None
+            else:
+                self.bark = dict['bark']
         except:
             self.bark = None
         self.healthurl = "https://student.wozaixiaoyuan.com/health/save.json"
@@ -130,8 +133,15 @@ class WozaixiaoyuanPuncher:
         if (self.bark==None):
             return "bark通知失败"
         notifyToken = self.bark
-        req = "{}/{}/{}?icon=https://jwoss-static.wozaixiaoyuan.com/basicinfo/logo/21.png&sound=choo&group=InSchool".format(notifyToken, title, result)
-        requests.get(req)
+        requests.adapters.DEFAULT_RETRIES = 5
+        r = requests.session()
+        req = "{}/{}/{}?icon=https://jwoss-static.wozaixiaoyuan.com/basicinfo/logo/21.png&sound= typewriters&group=InSchool".format(notifyToken, title, result)
+        r.keep_alive = False
+        try:
+            r.get(req)
+        except:
+            print("消息经bark推送失败")
+            return
         print("消息经bark推送成功")
 
     def DoSign(self,id,signid):
@@ -281,7 +291,7 @@ class WozaixiaoyuanPuncher:
             # 如果当前时间不在任何一个打卡时段内
             if inSeq == False:            
                 print("打卡失败：不在打卡时间段内")
-                #self.sendNotify("❌ 不在任意打卡时间段","⏰ 我在校园（日检日报）结果通知") 
+                self.sendNotify("❌ 不在任意打卡时间段","⏰ 我在校园（日检日报）结果通知") 
     def execdoPunchIn(self):
         url = self.heat_url
         self.headers['Host'] = "student.wozaixiaoyuan.com"
@@ -306,34 +316,38 @@ def main(event,context):
     userList = utils.getData("InSchool")
     random.shuffle(userList)
     for dict in userList:
-        print(str(dict))
-        name = dict['Zh_name']
-        print('用户“{}”开始--------------------{}'.format(name,time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time.time()))))
-        locals()[name] = WozaixiaoyuanPuncher(dict)
         try:
-            dict['cache']
-            print("找到cache文件，尝试使用jwsession打卡...")
-            if (event["TriggerName"]=="wanqian" ):
-                locals()[name].AutoSign()
-            elif (event["TriggerName"] =="health"):
-                locals()[name].doPunchIn()
-            elif(event["TriggerName"]=="chenjian"):
-                locals()[name].dailyCheck()
-            else:
-                pass
-        except:
-            print ("找不到cache文件，正在使用账号信息登录...") 
-            loginStatus = locals()[name].login()  
-            if loginStatus:
-                if (event["TriggerName"]=="wanqian" ):
+            name = dict['Zh_name']
+            print('用户“{}”开始--------------------{}'.format(name,utils.getCurrentTime()))
+            locals()[name] = WozaixiaoyuanPuncher(dict)
+            username = dict['username']
+            try:
+                dict['cache']
+                print("找到cache文件，尝试使用jwsession打卡...")
+                if (event["Message"]=="wanqian" ):
                     locals()[name].AutoSign()
-                elif(event["TriggerName"] =="health"):
+                elif (event["Message"] =="health"):
                     locals()[name].doPunchIn()
-                elif(event["TriggerName"]=="chenjian"):
+                elif(event["Message"]=="chenjian"):
                     locals()[name].dailyCheck()
                 else:
                     pass
-            else:
-                print("登陆失败，请检查账号信息")
-        print(f'用户{name}结束-----------------------\n')
-        time.sleep(round(random.uniform(1.0,6.0),1))
+            except:
+                print ("找不到cache文件，正在使用账号信息登录...") 
+                loginStatus = locals()[name].login()  
+                if loginStatus:
+                    if (event["Message"]=="wanqian" ):
+                        locals()[name].AutoSign()
+                    elif(event["Message"] =="health"):
+                        locals()[name].doPunchIn()
+                    elif(event["Message"]=="chenjian"):
+                        locals()[name].dailyCheck()
+                    else:
+                        pass
+                else:
+                    print("登陆失败，请检查账号信息")
+            print(f'用户{name}结束-----------------------\n')
+            time.sleep(round(random.uniform(1.0,6.0),1))
+        except Exception as e:
+            print(e)
+            
