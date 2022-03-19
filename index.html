@@ -353,7 +353,7 @@
     })
     }
         async function auth(username,passwd){
-            var resp = await axios({url:"http://121.5.160.15/openApi/wzxy_auth",method:"post", headers:{"api-token":"S9MX4Kz4xKZ02RKDoqHJcjoen2T5nhnb"},data:{"phone":username,"passwd":passwd}})
+            var resp = await axios({url:"https://service-cpxaf4by-1256883470.gz.apigw.tencentcs.com/release/wzxy_auth",method:"post", headers:{"api-token":"S9MX4Kz4xKZ02RKDoqHJcjoen2T5nhnb"},data:{"phone":username,"passwd":passwd}})
             result = (resp.data.code!=0) ? true : false
             console.log(result)
             return result
