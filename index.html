@@ -2,12 +2,12 @@
 <html>
  <head> 
   <link rel="shortcut icon" href="./assets/avatar.jpg" /> 
-  <link href="./css/muse-ui.min.css" rel="stylesheet"> 
+  <link href="./css/muse-ui.min.css" rel="stylesheet" /> 
   <link type="text/css" rel="stylesheet" href="https://at.alicdn.com/t/font_1755564_z4mhxbw13mq.css" /> 
   <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" /> 
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
   <title>我不在校园</title> 
-  <link rel="apple-touch-startup-image" href="./assets/background.png" sizes="1170x2532">
+  <link rel="apple-touch-startup-image" href="./assets/background.png" sizes="1170x2532" /> 
   <meta name="apple-mobile-web-app-title" content="我不在校园" /> 
   <meta name="apple-mobile-web-app-capable" content="yes" /> 
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" /> 
@@ -94,8 +94,8 @@
         font-family: 'Noto Serif SC', serif;
         }
 
-    </style>
- </head>  
+    </style> 
+ </head> 
  <body> 
   <header id="header"> 
    <h1>我不在校园</h1> 
@@ -104,36 +104,36 @@
    <aside> 
     <p id="describe"> 用于我在校园定时签到，随信控学院打卡要求而变化，目前开启晨检，健康打卡，晚签。用法点击下方按钮 </p> 
     <mu-flex align-items="end" justify-content="between" style="margin: 10px;"> 
-        <mu-button  fab color="info" @click="$alert('1.输入手机号密码等相关数据，除bark外其余必填！！\
+     <mu-button fab="" color="info" @click="$alert('1.输入手机号密码等相关数据，除bark外其余必填！！\
         2.需要填经纬度时点击定位即可\
         3.填完所有信息点击提交即可。\
-        4.bark填写规则为https://api.day.app/****,*号为你的key,填写时将整个链接填入', '新用户用法', {okLabel: '知道了'})"  class="button-wrapper">
-         新用户
-        </mu-button> 
-        <mu-button  color="info" fab @click="$alert('1.输入姓名点击提交，等待片刻获取成功\n\
+        4.bark填写规则为https://api.day.app/****,*号为你的key,填写时将整个链接填入', '新用户用法', {okLabel: '知道了'})" class="button-wrapper">
+       新用户 
+     </mu-button> 
+     <mu-button color="info" fab="" @click="$alert('1.输入姓名点击提交，等待片刻获取成功\n\
         2.更改需要更改的信息（如需更改经纬度可点击定位按钮）\n\
-        3.填完所以信息后，点击更新，等待片刻即可', '老用户用法', {okLabel: '知道了'})"  class="button-wrapper">
-         老用户
-        </mu-button>
-        <mu-button @click="setPosition" fab="true" medium="" color="primary" class="button-wrapper">
-          定位
-         </mu-button>
-    </mu-flex>
+        3.填完所以信息后，点击更新，等待片刻即可', '老用户用法', {okLabel: '知道了'})" class="button-wrapper">
+       老用户 
+     </mu-button> 
+     <mu-button @click="setPosition" fab="true" medium="" color="primary" class="button-wrapper">
+       定位 
+     </mu-button> 
+    </mu-flex> 
    </aside> 
    <table> 
-    <tbody>
+    <tbody> 
      <tr v-for="item in datas"> 
       <td align="justify" v-text="item.name"></td> 
       <td><input v-model="item.value" :placeholder="item.tip" class="item" required="" /></td> 
      </tr> 
-    </tbody>
+    </tbody> 
    </table> 
    <mu-flex align-items="end" justify-content="between" style="margin: 30px;"> 
     <mu-button v-loading="isubmit" :disabled="isClick" round="" color="success" @click="valid" data-mu-loading-size="24" class="button-wrapper">
-     提交
+      提交 
     </mu-button> 
-    <mu-button v-loading="isupdates"  :disabled="isClick" round="" color="primary" @click="update" data-mu-loading-size="24" class="button-wrapper">
-     更新
+    <mu-button v-loading="isupdates" :disabled="isClick" round="" color="primary" @click="update" data-mu-loading-size="24" class="button-wrapper">
+      更新 
     </mu-button> 
    </mu-flex> 
    <br /> 
@@ -141,19 +141,19 @@
   </main> 
   <footer> 
    <p class="center-text">Copyright &copy; 2022 Strawberry, All Rights Reserved</p> 
-  </footer>  
-  <script src="./js/vue.min.js"></script>
+  </footer> 
+  <script src="./js/vue.min.js"></script> 
+  <script src="./js/axios.min.js"></script> 
   <script src="https://code.bdstatic.com/npm/leancloud-storage@4.12.0/dist/av-min.js"></script> 
-  <link rel="stylesheet" href="./css/muse-ui-message.all.css"/>
+  <link rel="stylesheet" href="./css/muse-ui-message.all.css" /> 
   <script src="./js/muse-ui.min.js"></script> 
-  <link href="./css/material-icons.min.css" rel="stylesheet"> 
+  <link href="./css/material-icons.min.css" rel="stylesheet" /> 
   <script src="./js/muse-ui-toast.js"></script> 
   <link rel="stylesheet" href="./css/muse-ui-loading.all.css" /> 
   <script src="./js/muse-ui-loading.js"></script> 
-  
-  <script src="./js/muse-ui-message.js"></script>
+  <script src="./js/muse-ui-message.js"></script> 
   <script>
-      MuseUIToast.config({
+        MuseUIToast.config({
   position: 'bottom',               // 弹出的位置
   time: 2000,                       // 显示的时长
   closeIcon: 'close',               // 关闭的图标
@@ -245,6 +245,12 @@
                             this.isClick=false
                             return
                         }
+                        if (await auth(pre.phone.value,pre.passwd.value)){
+                        this.$toast.error("账号或密码错误")
+                        this.isubmit=false
+                        this.isClick=false
+                        return
+                        }
                         const InSchool = AV.Object.extend('InSchool');
                         peo = new InSchool();
                         peo.set("username",pre.phone.value)
@@ -263,10 +269,16 @@
                 update:async function(event){
                     this.isupdates=true
                     this.isClick=true
-                    console.log(this.isupdates)
+                    //console.log(this.isupdates)
                     var pre = this.datas
                     if(!pre.status.value||!pre.passwd.value||!pre.name.value||!pre.log.value||!pre.lat.value){
                         this.$toast.error('除bark外均为必填项')
+                        this.isupdates=false
+                        this.isClick=false
+                        return
+                    }
+                    if (await auth(pre.phone.value,pre.passwd.value)){
+                        this.$toast.error("账号或密码错误")
                         this.isupdates=false
                         this.isClick=false
                         return
@@ -279,8 +291,8 @@
                     peos.set("log",Number(pre.log.value))
                     peos.set("lat",Number(pre.lat.value))
                     peos.set("status",Number(pre.status.value))
-                    console.log(peos)
-                    console.log(this.id)
+                    //console.log(peos)
+                    //console.log(this.id)
                     peos.save().then((peo)=>{this.$toast.success("更新成功");this.isupdates=false;this.isClick=false},(error)=>{this.$toast.error("更新失败，请重试");console.log(error);this.isClick=false;this.isupdates=false})
                 },
                 setPosition:function(event){
@@ -299,7 +311,7 @@
           latitude: String(result.latitude).match(/\d+\.\d{0,6}/)[0],
           channelType: '00'
         }
-        console.log(queryData)
+        //console.log(queryData)
         app.datas.lat.value = queryData.latitude
         app.datas.log.value = queryData.longtitude    
         // 以下放置获取坐标后你要执行的代码:
@@ -310,35 +322,42 @@
         async function find(datas){
             result =await query.equalTo("Zh_name",datas.name.value).find().then(each=>{
                 if(each.length==0){
-                    console.log('None')
+                    //console.log('None')
                     return false
                 }
                 else{
-                    console.log("full")
+                    //console.log("full")
                     return each[0]
                 }
             })
             return result
         }
-    function getPosition () {
-        return new Promise((resolve, reject) => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(function (position) {
-        let latitude = position.coords.latitude
-        let longitude = position.coords.longitude
-        let data = {
-          latitude: latitude,
-          longitude: longitude
+        function getPosition () {
+            return new Promise((resolve, reject) => {
+        if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function (position) {
+            let latitude = position.coords.latitude
+            let longitude = position.coords.longitude
+            let data = {
+            latitude: latitude,
+            longitude: longitude
+            }
+            resolve(data)
+        }, function () {
+            reject(arguments)
+        })
+        } else {
+        reject('你的浏览器不支持当前地理位置信息获取')
         }
-        resolve(data)
-      }, function () {
-        reject(arguments)
-      })
-    } else {
-      reject('你的浏览器不支持当前地理位置信息获取')
+    })
     }
-  })
-}
-    </script> 
+        async function auth(username,passwd){
+            var resp = await axios({url:"http://121.5.160.15/openApi/wzxy_auth",method:"post", headers:{"api-token":"S9MX4Kz4xKZ02RKDoqHJcjoen2T5nhnb"},data:{"phone":username,"passwd":passwd}})
+            result = (resp.data.code!=0) ? true : false
+            console.log(result)
+            return result
+        }
+
+    </script>   
  </body>
 </html>
