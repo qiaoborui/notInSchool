@@ -105,15 +105,14 @@
    <aside> 
     <p id="describe"> 用于我在校园定时签到，随信控学院打卡要求而变化，目前开启晨检，健康打卡，晚签。用法点击下方按钮 </p> 
     <mu-flex align-items="end" justify-content="between" style="margin: 10px;"> 
-     <mu-button fab="" color="info" @click="$alert('1.输入手机号密码等相关数据，除bark外其余必填！！\
-        2.需要填经纬度时点击定位即可\
-        3.填完所有信息点击提交即可。\
-        4.bark填写规则为https://api.day.app/****,*号为你的key,填写时将整个链接填入', '新用户用法', {okLabel: '知道了'})" class="button-wrapper">
+     <mu-button fab="" color="info" @click="$alert(function (createElement) {
+  return createElement('div', [createElement('h2', '新用户用法'),createElement('p', '1.填入除bark外所有信息'),createElement('p', '2.填写经纬度时请点击“定位”按钮'),createElement('p', '3.强烈建议在我的校园更改一次密码后再填写新密码'),createElement('p', '4.在开始使用该程序后请勿手动登录我在校园'),])
+})" class="button-wrapper">
        新用户 
      </mu-button> 
-     <mu-button color="info" fab="" @click="$alert('1.输入姓名点击提交，等待片刻获取成功\n\
-        2.更改需要更改的信息（如需更改经纬度可点击定位按钮）\n\
-        3.填完所以信息后，点击更新，等待片刻即可', '老用户用法', {okLabel: '知道了'})" class="button-wrapper">
+     <mu-button color="info" fab="" @click="$alert(function (createElement) {
+        return createElement('div', [createElement('h2', '老用户用法'),createElement('p', '1.输入姓名后点击提交等待片刻'),createElement('p', '2.更改相关信息'),createElement('p', '3.如需更改经纬度，点击定位即可'),createElement('p', '4.更改完成后点击更新即可'),])
+      })" class="button-wrapper">
        老用户 
      </mu-button> 
      <mu-button @click="setPosition" fab="true" medium="" color="primary" class="button-wrapper">
