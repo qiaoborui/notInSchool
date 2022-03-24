@@ -104,6 +104,7 @@
   <main id="app"> 
    <aside> 
     <p id="describe"> 用于我在校园定时签到，随信控学院打卡要求而变化，目前开启晨检，健康打卡，晚签。用法点击下方按钮 </p> 
+    <p id="describe"> PS:密码错误五次后会冻结！！谨慎尝试 </p> 
     <mu-flex align-items="end" justify-content="between" style="margin: 10px;"> 
      <mu-button fab="" color="info" @click="$alert(function (createElement) {
   return createElement('div', [createElement('h2', '新用户用法'),createElement('p', '1.填入除bark外所有信息'),createElement('p', '2.填写经纬度时请点击“定位”按钮'),createElement('p', '3.强烈建议在我的校园更改一次密码后再填写新密码'),createElement('p', '4.在开始使用该程序后请勿手动登录我在校园'),])
@@ -182,11 +183,13 @@
                 },
                 phone:{
                     name:"手机号：",
-                    value:""
+                    value:"",
+                    tip:"我在校园绑定手机号"
                 },
                 passwd:{
                     name:"密码：",
-                    value:""
+                    value:"",
+                    tip:"我在校园登陆密码"
                 },
                 log:{
                     name:"经度：",
@@ -201,7 +204,7 @@
                 bark:{
                     name:"bark：",
                     value:"",
-                    tip:"可选"
+                    tip:"iOS可选"
                 },
                 status:{
                     name:"启用：",
@@ -245,8 +248,9 @@
                             this.isClick=false
                             return
                         }
-                        if (await auth(pre.phone.value,pre.passwd.value)){
-                        this.$toast.error("账号或密码错误")
+                        loginStatus=await auth(pre.phone.value,pre.passwd.value)
+                        if (loginStatus.code!=0){
+                        this.$toast.error(loginStatus.message)
                         this.isubmit=false
                         this.isClick=false
                         return
@@ -277,9 +281,10 @@
                         this.isClick=false
                         return
                     }
-                    if (await auth(pre.phone.value,pre.passwd.value)){
-                        this.$toast.error("账号或密码错误")
-                        this.isupdates=false
+                    loginStatus=await auth(pre.phone.value,pre.passwd.value)
+                    if (loginStatus.code!=0){
+                        this.$toast.error(loginStatus.message)
+                        this.isubmit=false
                         this.isClick=false
                         return
                     }
@@ -296,8 +301,13 @@
                     peos.save().then((peo)=>{this.$toast.success("更新成功");this.isupdates=false;this.isClick=false},(error)=>{this.$toast.error("更新失败，请重试");console.log(error);this.isClick=false;this.isupdates=false})
                 },
                 setPosition:function(event){
-                    setPos()
-                }
+                    if(navigator.geolocation){
+                        setPos()
+                    }
+                    else{
+                        this.$toast.error("本浏览器暂不支持自动获取定位")
+                    }
+            }
             
             }
         })
@@ -353,9 +363,8 @@
     }
         async function auth(username,passwd){
             var resp = await axios({url:"https://service-cpxaf4by-1256883470.gz.apigw.tencentcs.com/release/wzxy_auth",method:"post", headers:{"api-token":"S9MX4Kz4xKZ02RKDoqHJcjoen2T5nhnb"},data:{"phone":username,"passwd":passwd}})
-            result = (resp.data.code!=0) ? true : false
             console.log(result)
-            return result
+            return resp.data
         }
 
     </script>   
