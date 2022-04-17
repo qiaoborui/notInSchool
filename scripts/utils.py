@@ -21,8 +21,13 @@ def getAddress(lat,lng):
     results['township'] = result['result']['address_reference']['town']['title']
   except:
     results['township'] = ''
+  try:
+    results['citycode'] = result['result']['ad_info']['city_code']
+  except:
+    results['citycode'] = ''
   del results['street_number']
   return results
+
 def isEnabled(dict):
   try:
     if dict['status'] == 0:

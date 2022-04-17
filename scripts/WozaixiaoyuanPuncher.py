@@ -1,9 +1,9 @@
 #需使用utils.py
 
+from re import T
 import requests
 import json
 import hashlib
-import os
 import time
 import utils
 import random
@@ -40,6 +40,10 @@ class WozaixiaoyuanPuncher:
         self.log=float(dict['log'])
         self.lat=float(dict['lat'])
         dict = utils.getAddress(self.lat,self.log)
+        self.city_code = dict['citycode']
+        t = int(round(time.time() * 1000)) 
+        content = f"{dict['province']}_{t}_{dict['city']}"
+        signature = hashlib.sha256(content.encode('utf-8')).hexdigest()
         self.sign_data = {
             "answers": '["0","0","1"]',
             "latitude": str(random.uniform(self.lat-0.0003,self.lat+0.0003)),
@@ -49,7 +53,10 @@ class WozaixiaoyuanPuncher:
             "district":dict['district'],
             "province": dict['province'],
             "township": dict['township'],
-            "street":dict['street']
+            "street":dict['street'],
+            "city_code":self.city_code,
+            "timestampHeader":t,
+            "signatureHeader":signature
         }
         self.headers = {
             "Accept-Encoding": "gzip, deflate, br",
@@ -71,7 +78,10 @@ class WozaixiaoyuanPuncher:
             "district":dict['district'],
             "province": dict['province'],
             "township": dict['township'],
-            "street":dict['street']
+            "street":dict['street'],
+            "city_code":self.city_code,
+            "timestampHeader":t,
+            "signatureHeader":signature
         }
         self.nightData ={
             "latitude": str(random.uniform(self.lat-0.0003,self.lat+0.0003)),
@@ -81,7 +91,10 @@ class WozaixiaoyuanPuncher:
             "district":dict['district'],
             "province": dict['province'],
             "township": dict['township'],
-            "street":dict['street']
+            "street":dict['street'],
+            "city_code":self.city_code,
+            "timestampHeader":t,
+            "signatureHeader":signature
             }
         self.body="{}"
     def login(self):
