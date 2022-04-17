@@ -363,4 +363,42 @@ def main(event,context):
             time.sleep(round(random.uniform(1.0,6.0),1))
         except Exception as e:
             print(e)
-            
+
+if __name__=="__main__":
+    userList = utils.getData("InSchool")
+    random.shuffle(userList)
+    for dict in userList:
+        try:
+            name = dict['Zh_name']
+            print('用户“{}”开始--------------------{}'.format(name,utils.getCurrentTime()))
+            locals()[name] = WozaixiaoyuanPuncher(dict)
+            username = dict['username']
+            try:
+                dict['cache']
+                print("找到cache文件，尝试使用jwsession打卡...")
+                if (sys.argv[1]=="wanqian" ):
+                    locals()[name].AutoSign()
+                elif (sys.argv[1] =="health"):
+                    locals()[name].doPunchIn()
+                elif(sys.argv[1]=="chenjian"):
+                    locals()[name].dailyCheck()
+                else:
+                    pass
+            except:
+                print ("找不到cache文件，正在使用账号信息登录...") 
+                loginStatus = locals()[name].login()  
+                if loginStatus:
+                    if (sys.argv[1]=="wanqian" ):
+                        locals()[name].AutoSign()
+                    elif(sys.argv[1] =="health"):
+                        locals()[name].doPunchIn()
+                    elif(sys.argv[1]=="chenjian"):
+                        locals()[name].dailyCheck()
+                    else:
+                        pass
+                else:
+                    print("登陆失败，请检查账号信息")
+            print(f'用户{name}结束-----------------------\n')
+            time.sleep(round(random.uniform(1.0,6.0),1))
+        except Exception as e:
+            print(e)
