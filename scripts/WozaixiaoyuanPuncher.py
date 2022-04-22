@@ -112,10 +112,17 @@ class WozaixiaoyuanPuncher:
             return True
         else:
             print(res)
+            self.disAble()
             print(username)
             print("登录失败，请检查账号信息")
-            self.sendNotify("❌ 打卡失败，登录错误，请检查账号信息","⏱️ 我在校园")
+            self.sendNotify("❌ 登录失败，账号已禁用","⏱️ 我在校园")
             return False
+    def disAble(self):
+        try:
+            self.lc.set("status",0).save()
+            print("禁用成功")
+        except:
+            print("禁用失败")
     def setJwsession(self, jwsession):
         """# 如果找不到cache,新建cache储存目录与文件
         if not os.path.exists('.cache'):
